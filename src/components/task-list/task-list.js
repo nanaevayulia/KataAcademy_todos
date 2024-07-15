@@ -1,18 +1,49 @@
+import { Component } from "react";
 import Task from "../task";
 import "./task-list.css";
 
-const TaskList = ({ todos }) => {
-  const tasks = todos.map((item) => {
-    const { id, status, ...itemProps } = item;
+export default class TaskList extends Component {
+  render() {
+    const { todos, onDeleted, onCheckboxClick, filterData } = this.props;
+    const tasks = todos.map((item) => {
+      const { id, label, completed, editing } = item;
+      let className = "active";
+      let checked = false;
+      if (completed) {
+        className = "completed";
+        checked = true;
+      }
+      if (editing) {
+        className = "editing";
+      }
+      if (filterData === "all") {
+        return (
+          <li key={id} className={className}>
+            <Task
+              label={label}
+              checked={checked}
+              onDeleted={() => onDeleted(id)}
+              onCheckboxClick={() => onCheckboxClick(id)}
+            />
+          </li>
+        );
+      }
+      if (className === filterData || className === "editing") {
+        return (
+          <li key={id} className={className}>
+            <Task
+              label={label}
+              className={className}
+              checked={checked}
+              onDeleted={() => onDeleted(id)}
+              onCheckboxClick={() => onCheckboxClick(id)}
+            />
+          </li>
+        );
+      }
+      return null;
+    });
 
-    return (
-      <li key={id} className={status}>
-        <Task {...itemProps} />
-      </li>
-    );
-  });
-
-  return <ul className="todo-list">{tasks}</ul>;
-};
-
-export default TaskList;
+    return <ul className="todo-list">{tasks}</ul>;
+  }
+}
