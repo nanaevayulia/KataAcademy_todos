@@ -1,48 +1,58 @@
 import { Component } from "react";
 import Task from "../task";
 import "./task-list.css";
+import PropTypes from "prop-types";
 
 export default class TaskList extends Component {
+  static defaultProps = {
+    todos: [
+      {
+        id: 1,
+        label: "Получить данные с сервера",
+        completed: false,
+        editing: false,
+        time: new Date(),
+      },
+    ],
+    filterData: "all",
+    onDeleted: () => {},
+    onCheckboxClick: () => {},
+  };
+
+  static propTypes = {
+    todos: PropTypes.arrayOf(PropTypes.object),
+    filterData: PropTypes.oneOf(["all", "active", "completed"]),
+    onDeleted: PropTypes.func,
+    onCheckboxClick: PropTypes.func,
+  };
+
   render() {
-    const { todos, onDeleted, onCheckboxClick, filterData } = this.props;
-    const tasks = todos.map((item) => {
-      const { id, label, completed, editing } = item;
-      let className = "active";
-      let checked = false;
-      if (completed) {
-        className = "completed";
-        checked = true;
-      }
-      if (editing) {
-        className = "editing";
-      }
-      if (filterData === "all") {
+    let { todos, onDeleted, onCheckboxClick, filterData } = this.props;
+    let tasks;
+
+    const taskTemplate = () => {
+      tasks = todos.map((el) => {
+        const { id, ...itemProps } = el;
         return (
-          <li key={id} className={className}>
-            <Task
-              label={label}
-              checked={checked}
-              onDeleted={() => onDeleted(id)}
-              onCheckboxClick={() => onCheckboxClick(id)}
-            />
-          </li>
+          <Task
+            key={id}
+            {...itemProps}
+            onCheckboxClick={() => onCheckboxClick(id)}
+            onDeleted={() => onDeleted(id)}
+          />
         );
-      }
-      if (className === filterData || className === "editing") {
-        return (
-          <li key={id} className={className}>
-            <Task
-              label={label}
-              className={className}
-              checked={checked}
-              onDeleted={() => onDeleted(id)}
-              onCheckboxClick={() => onCheckboxClick(id)}
-            />
-          </li>
-        );
-      }
-      return null;
-    });
+      });
+    };
+
+    if (filterData === "all") {
+      taskTemplate();
+    } else if (filterData === "active") {
+      todos = todos.filter((el) => !el.completed);
+      taskTemplate();
+    } else if (filterData === "completed") {
+      todos = todos.filter((el) => el.completed);
+      taskTemplate();
+    }
 
     return <ul className="todo-list">{tasks}</ul>;
   }

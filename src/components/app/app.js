@@ -3,20 +3,39 @@ import TaskList from "../task-list";
 import Footer from "../footer";
 import "./app.css";
 import { Component } from "react";
+import PropTypes from "prop-types";
 
 export default class App extends Component {
   maxId = 0;
 
   state = {
     todoData: [
-      this.createTodoTask("Completed task"),
-      this.createTodoTask("Editing task"),
-      this.createTodoTask("Active task"),
+      this.createTodoTask("Completed task", new Date(2024, 4, 17)),
+      this.createTodoTask("Editing task", new Date(2024, 6, 4)),
+      this.createTodoTask("Active task", new Date(2024, 6, 17, 12, 10, 0)),
     ],
     filterData: "all",
   };
 
-  createTodoTask(label) {
+  static defaultProps = {
+    todoData: [
+      {
+        id: 1,
+        label: "Получить данные с сервера",
+        completed: false,
+        editing: false,
+        time: Date.now(),
+      },
+    ],
+    filterData: "all",
+  };
+
+  static propTypes = {
+    todoData: PropTypes.arrayOf(PropTypes.object),
+    filterData: PropTypes.string,
+  };
+
+  createTodoTask(label, time) {
     const trimLabel = label.replace(/ +/g, " ").trim();
 
     return {
@@ -24,6 +43,7 @@ export default class App extends Component {
       label: trimLabel,
       completed: false,
       editing: false,
+      time,
     };
   }
 
@@ -38,7 +58,7 @@ export default class App extends Component {
   };
 
   addTask = (text) => {
-    const newTask = this.createTodoTask(text);
+    const newTask = this.createTodoTask(text, new Date());
 
     this.setState(({ todoData }) => {
       const newArray = [...todoData, newTask];

@@ -1,11 +1,20 @@
 import "./tasks-filter.css";
 import { Component } from "react";
+import PropTypes from "prop-types";
 
 export default class TasksFilter extends Component {
   state = {
     allButton: true,
     activeButton: false,
     completedButton: false,
+  };
+
+  static defaultProps = {
+    setFilterData: () => {},
+  };
+
+  static propTypes = {
+    setFilterData: PropTypes.func,
   };
 
   onClickFilter = (e) => {
