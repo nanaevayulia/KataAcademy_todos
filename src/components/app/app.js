@@ -1,33 +1,35 @@
-import NewTaskForm from "../new-task-form";
-import TaskList from "../task-list";
-import Footer from "../footer";
-import "./app.css";
-import { Component } from "react";
-import PropTypes from "prop-types";
+import { Component } from 'react';
+import PropTypes from 'prop-types';
+
+import NewTaskForm from '../new-task-form';
+import TaskList from '../task-list';
+import Footer from '../footer';
+
+import './app.css';
 
 export default class App extends Component {
   maxId = 0;
 
   state = {
     todoData: [
-      this.createTodoTask("Completed task", new Date(2024, 4, 17)),
-      this.createTodoTask("Editing task", new Date(2024, 6, 4)),
-      this.createTodoTask("Active task", new Date(2024, 6, 17, 12, 10, 0)),
+      this.createTodoTask('Completed task', new Date(2024, 4, 17)),
+      this.createTodoTask('Editing task', new Date(2024, 6, 4)),
+      this.createTodoTask('Active task', new Date(2024, 6, 17, 12, 10, 0)),
     ],
-    filterData: "all",
+    filterData: 'all',
   };
 
   static defaultProps = {
     todoData: [
       {
         id: 1,
-        label: "Получить данные с сервера",
+        label: 'Получить данные с сервера',
         completed: false,
         editing: false,
         time: Date.now(),
       },
     ],
-    filterData: "all",
+    filterData: 'all',
   };
 
   static propTypes = {
@@ -36,7 +38,7 @@ export default class App extends Component {
   };
 
   createTodoTask(label, time) {
-    const trimLabel = label.replace(/ +/g, " ").trim();
+    const trimLabel = label.replace(/ +/g, ' ').trim();
 
     return {
       id: this.maxId++,

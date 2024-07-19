@@ -1,27 +1,28 @@
-import { Component } from "react";
-import Task from "../task";
-import "./task-list.css";
-import PropTypes from "prop-types";
+import { Component } from 'react';
+import PropTypes from 'prop-types';
+
+import Task from '../task';
+import './task-list.css';
 
 export default class TaskList extends Component {
   static defaultProps = {
     todos: [
       {
         id: 1,
-        label: "Получить данные с сервера",
+        label: 'Получить данные с сервера',
         completed: false,
         editing: false,
         time: new Date(),
       },
     ],
-    filterData: "all",
+    filterData: 'all',
     onDeleted: () => {},
     onCheckboxClick: () => {},
   };
 
   static propTypes = {
     todos: PropTypes.arrayOf(PropTypes.object),
-    filterData: PropTypes.oneOf(["all", "active", "completed"]),
+    filterData: PropTypes.oneOf(['all', 'active', 'completed']),
     onDeleted: PropTypes.func,
     onCheckboxClick: PropTypes.func,
   };
@@ -34,22 +35,17 @@ export default class TaskList extends Component {
       tasks = todos.map((el) => {
         const { id, ...itemProps } = el;
         return (
-          <Task
-            key={id}
-            {...itemProps}
-            onCheckboxClick={() => onCheckboxClick(id)}
-            onDeleted={() => onDeleted(id)}
-          />
+          <Task key={id} {...itemProps} onCheckboxClick={() => onCheckboxClick(id)} onDeleted={() => onDeleted(id)} />
         );
       });
     };
 
-    if (filterData === "all") {
+    if (filterData === 'all') {
       taskTemplate();
-    } else if (filterData === "active") {
+    } else if (filterData === 'active') {
       todos = todos.filter((el) => !el.completed);
       taskTemplate();
-    } else if (filterData === "completed") {
+    } else if (filterData === 'completed') {
       todos = todos.filter((el) => el.completed);
       taskTemplate();
     }

@@ -1,7 +1,7 @@
-import "./tasks-filter.css";
-import { Component } from "react";
-import PropTypes from "prop-types";
+import { Component } from 'react';
+import PropTypes from 'prop-types';
 
+import './tasks-filter.css';
 export default class TasksFilter extends Component {
   state = {
     allButton: true,
@@ -19,19 +19,19 @@ export default class TasksFilter extends Component {
 
   onClickFilter = (e) => {
     const buttonClicked = e.target.innerText.toLowerCase();
-    if (buttonClicked === "all") {
+    if (buttonClicked === 'all') {
       this.setState({
         allButton: true,
         activeButton: false,
         completedButton: false,
       });
-    } else if (buttonClicked === "active") {
+    } else if (buttonClicked === 'active') {
       this.setState({
         allButton: false,
         activeButton: true,
         completedButton: false,
       });
-    } else if (buttonClicked === "completed") {
+    } else if (buttonClicked === 'completed') {
       this.setState({
         allButton: false,
         activeButton: false,
@@ -47,7 +47,7 @@ export default class TasksFilter extends Component {
       <ul className="filters">
         <li>
           <button
-            className={allButton ? "selected" : ""}
+            className={allButton ? 'selected' : ''}
             onClick={(e) => {
               setFilterData(e);
               this.onClickFilter(e);
@@ -58,7 +58,7 @@ export default class TasksFilter extends Component {
         </li>
         <li>
           <button
-            className={activeButton ? "selected" : ""}
+            className={activeButton ? 'selected' : ''}
             onClick={(e) => {
               setFilterData(e);
               this.onClickFilter(e);
@@ -69,7 +69,7 @@ export default class TasksFilter extends Component {
         </li>
         <li>
           <button
-            className={completedButton ? "selected" : ""}
+            className={completedButton ? 'selected' : ''}
             onClick={(e) => {
               setFilterData(e);
               this.onClickFilter(e);

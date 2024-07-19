@@ -1,10 +1,10 @@
-import "./new-task-form.css";
-import { Component } from "react";
-import PropTypes from "prop-types";
+import { Component } from 'react';
+import PropTypes from 'prop-types';
 
+import './new-task-form.css';
 export default class NewTaskForm extends Component {
   state = {
-    label: "",
+    label: '',
   };
 
   static defaultProps = {
@@ -23,13 +23,13 @@ export default class NewTaskForm extends Component {
     const { label } = this.state;
 
     e.preventDefault();
-    if (!label || label.replace(/ +/g, " ") === " ") {
-      this.setState({ label: "" });
+    if (!label || label.replace(/ +/g, ' ') === ' ') {
+      this.setState({ label: '' });
       return;
     }
 
     this.props.onTaskAdded(label);
-    this.setState({ label: "" });
+    this.setState({ label: '' });
   };
 
   render() {
