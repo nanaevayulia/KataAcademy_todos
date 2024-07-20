@@ -31,3 +31,5 @@ export default class Footer extends Component {
     );
   }
 }
+
+let arrow;
