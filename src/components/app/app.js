@@ -12,9 +12,9 @@ export default class App extends Component {
 
   state = {
     todoData: [
-      this.createTodoTask('Completed task', new Date(2024, 4, 17)),
-      this.createTodoTask('Editing task', new Date(2024, 6, 4)),
-      this.createTodoTask('Active task', new Date(2024, 6, 17, 12, 10, 0)),
+      this.createTodoTask('Completed task', new Date(2024, 4, 17), 90),
+      this.createTodoTask('Editing task', new Date(2024, 6, 4), 140),
+      this.createTodoTask('Active task', new Date(2024, 6, 17, 12, 10, 0), 15),
     ],
     filterData: 'all',
   };
@@ -27,6 +27,8 @@ export default class App extends Component {
         completed: false,
         editing: false,
         time: Date.now(),
+        timerInSec: 0,
+        timerStarted: false,
       },
     ],
     filterData: 'all',
@@ -37,7 +39,7 @@ export default class App extends Component {
     filterData: PropTypes.string,
   };
 
-  createTodoTask(label, time) {
+  createTodoTask(label, time, timerInSec) {
     const trimLabel = label.replace(/ +/g, ' ').trim();
 
     return {
@@ -46,6 +48,8 @@ export default class App extends Component {
       completed: false,
       editing: false,
       time,
+      timerInSec,
+      timerStarted: false,
     };
   }
 
@@ -59,8 +63,8 @@ export default class App extends Component {
     });
   };
 
-  addTask = (text) => {
-    const newTask = this.createTodoTask(text, new Date());
+  addTask = (text, timerInSec) => {
+    const newTask = this.createTodoTask(text, new Date(), timerInSec);
 
     this.setState(({ todoData }) => {
       const newArray = [...todoData, newTask];
@@ -100,6 +104,30 @@ export default class App extends Component {
     });
   };
 
+  getTimeFromTimer = (timeFromTimer, id) => {
+    this.setState(({ todoData }) => {
+      const idx = todoData.findIndex((el) => el.id === id);
+      const newItem = { ...todoData[idx], timerInSec: timeFromTimer };
+      const newArray = [...todoData.slice(0, idx), newItem, ...todoData.slice(idx + 1)];
+
+      return {
+        todoData: newArray,
+      };
+    });
+  };
+
+  getTimerStartedFromTimer = (timerStartedFromTimer, id) => {
+    this.setState(({ todoData }) => {
+      const idx = todoData.findIndex((el) => el.id === id);
+      const newItem = { ...todoData[idx], timerStarted: timerStartedFromTimer };
+      const newArray = [...todoData.slice(0, idx), newItem, ...todoData.slice(idx + 1)];
+
+      return {
+        todoData: newArray,
+      };
+    });
+  };
+
   render() {
     const { todoData, filterData } = this.state;
     const notCompletedTasks = todoData.filter((el) => !el.completed).length;
@@ -113,9 +141,11 @@ export default class App extends Component {
         <section className="main">
           <TaskList
             todos={todoData}
+            filterData={filterData}
             onDeleted={this.deleteTask}
             onCheckboxClick={this.checkboxClick}
-            filterData={filterData}
+            onGetTimeFromTimer={this.getTimeFromTimer}
+            onGetTimerStartedFromTimer={this.getTimerStartedFromTimer}
           />
           <Footer
             notCompletedTasks={notCompletedTasks}

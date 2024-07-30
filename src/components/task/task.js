@@ -2,6 +2,8 @@ import { Component } from 'react';
 import PropTypes from 'prop-types';
 import { formatDistanceToNow } from 'date-fns';
 
+import Timer from '../timer';
+
 import './task.css';
 export default class Task extends Component {
   static defaulProps = {
@@ -9,8 +11,12 @@ export default class Task extends Component {
     completed: false,
     editing: false,
     time: new Date(),
+    timerInSec: 0,
+    timerStarted: false,
     onDeleted: () => {},
     onCheckboxClick: () => {},
+    onGetTimeFromTimer: () => {},
+    onGetTimerStartedFromTimer: () => {},
   };
 
   static propTypes = {
@@ -18,12 +24,29 @@ export default class Task extends Component {
     completed: PropTypes.bool,
     editing: PropTypes.bool,
     time: PropTypes.instanceOf(Date),
+    timerInSec: PropTypes.node,
+    timerStarted: PropTypes.bool,
     onDeleted: PropTypes.func,
     onCheckboxClick: PropTypes.func,
+    onGetTimeFromTimer: PropTypes.func,
+    onGetTimerStartedFromTimer: PropTypes.func,
   };
 
   render() {
-    const { label, completed, editing, time, onCheckboxClick, onDeleted } = this.props;
+    const {
+      id,
+      label,
+      completed,
+      editing,
+      time,
+      timerInSec,
+      timerStarted,
+      onCheckboxClick,
+      onDeleted,
+      onGetTimeFromTimer,
+      onGetTimerStartedFromTimer,
+    } = this.props;
+
     let className = 'active';
 
     if (completed) {
@@ -38,10 +61,17 @@ export default class Task extends Component {
         <div className="view">
           <input className="toggle" type="checkbox" readOnly onClick={onCheckboxClick} checked={completed} />
           <label>
-            <span className="description" onClick={onCheckboxClick}>
+            <span className="title" onClick={onCheckboxClick}>
               {label}
             </span>
-            <span className="created">created {formatDistanceToNow(time)} ago</span>
+            <Timer
+              id={id}
+              timerInSec={timerInSec}
+              timerStarted={timerStarted}
+              onGetTimeFromTimer={onGetTimeFromTimer}
+              onGetTimerStartedFromTimer={onGetTimerStartedFromTimer}
+            />
+            <span className="description">created {formatDistanceToNow(time)} ago</span>
           </label>
           <button className="icon icon-edit"></button>
           <button className="icon icon-destroy" onClick={onDeleted}></button>

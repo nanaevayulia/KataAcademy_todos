@@ -13,11 +13,15 @@ export default class TaskList extends Component {
         completed: false,
         editing: false,
         time: new Date(),
+        timerInSec: 0,
+        timerStarted: false,
       },
     ],
     filterData: 'all',
     onDeleted: () => {},
     onCheckboxClick: () => {},
+    onGetTimeFromTimer: () => {},
+    onGetTimerStartedFromTimer: () => {},
   };
 
   static propTypes = {
@@ -25,17 +29,27 @@ export default class TaskList extends Component {
     filterData: PropTypes.oneOf(['all', 'active', 'completed']),
     onDeleted: PropTypes.func,
     onCheckboxClick: PropTypes.func,
+    onGetTimeFromTimer: PropTypes.func,
+    onGetTimerStartedFromTimer: PropTypes.func,
   };
 
   render() {
-    let { todos, onDeleted, onCheckboxClick, filterData } = this.props;
+    let { todos, filterData, onDeleted, onCheckboxClick, onGetTimeFromTimer, onGetTimerStartedFromTimer } = this.props;
     let tasks;
 
     const taskTemplate = () => {
       tasks = todos.map((el) => {
         const { id, ...itemProps } = el;
         return (
-          <Task key={id} {...itemProps} onCheckboxClick={() => onCheckboxClick(id)} onDeleted={() => onDeleted(id)} />
+          <Task
+            key={id}
+            id={id}
+            {...itemProps}
+            onCheckboxClick={() => onCheckboxClick(id)}
+            onDeleted={() => onDeleted(id)}
+            onGetTimeFromTimer={(time) => onGetTimeFromTimer(time, id)}
+            onGetTimerStartedFromTimer={(timerStarted) => onGetTimerStartedFromTimer(timerStarted, id)}
+          />
         );
       });
     };
