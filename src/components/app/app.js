@@ -9,6 +9,7 @@ import './app.css';
 
 export default class App extends Component {
   maxId = 0;
+  timerId = [];
 
   state = {
     todoData: [
@@ -29,6 +30,7 @@ export default class App extends Component {
         time: Date.now(),
         timerInSec: 0,
         timerStarted: false,
+        disabled: false,
       },
     ],
     filterData: 'all',
@@ -50,10 +52,13 @@ export default class App extends Component {
       time,
       timerInSec,
       timerStarted: false,
+      disabled: false,
     };
   }
 
   deleteTask = (id) => {
+    this.onPauseTimer(id);
+
     this.setState(({ todoData }) => {
       const idx = todoData.findIndex((item) => item.id === id);
       const newArray = [...todoData.slice(0, idx), ...todoData.slice(idx + 1)];
@@ -75,12 +80,25 @@ export default class App extends Component {
   };
 
   checkboxClick = (id) => {
+    this.onPauseTimer(id);
+
     this.setState(({ todoData }) => {
       const newArray = todoData.map((item) => {
         if (item.id === id) {
-          return {
+          item = {
             ...item,
             completed: !item.completed,
+          };
+        }
+        if (item.id === id && item.completed) {
+          item = {
+            ...item,
+            disabled: true,
+          };
+        } else if (item.id === id && !item.completed) {
+          item = {
+            ...item,
+            disabled: false,
           };
         }
         return item;
@@ -104,28 +122,62 @@ export default class App extends Component {
     });
   };
 
-  getTimeFromTimer = (timeFromTimer, id) => {
+  tick(id) {
     this.setState(({ todoData }) => {
-      const idx = todoData.findIndex((el) => el.id === id);
-      const newItem = { ...todoData[idx], timerInSec: timeFromTimer };
-      const newArray = [...todoData.slice(0, idx), newItem, ...todoData.slice(idx + 1)];
+      const index = todoData.findIndex((el) => el.id === id);
+      const newItem = {
+        ...todoData[index],
+        timerStarted: true,
+        timerInSec: todoData[index].timerInSec - 1,
+      };
+      const newArr = [...todoData.slice(0, index), newItem, ...todoData.slice(index + 1)];
 
       return {
-        todoData: newArray,
+        todoData: newArr,
+      };
+    });
+  }
+
+  onPlayTimer = (id) => {
+    const { todoData } = this.state;
+    const index = todoData.findIndex((el) => el.id === id);
+    const oldItem = todoData[index];
+
+    if (oldItem.timerStarted) {
+      clearInterval(this.timerId[index]);
+    }
+
+    const newTimerId = setInterval(() => this.tick(id), 1000);
+    this.timerId[index] = newTimerId;
+
+    this.setState(({ todoData }) => {
+      const newItem = { ...oldItem, disabled: true };
+      const newArr = [...todoData.slice(0, index), newItem, ...todoData.slice(index + 1)];
+      return {
+        todoData: newArr,
       };
     });
   };
 
-  getTimerStartedFromTimer = (timerStartedFromTimer, id) => {
-    this.setState(({ todoData }) => {
-      const idx = todoData.findIndex((el) => el.id === id);
-      const newItem = { ...todoData[idx], timerStarted: timerStartedFromTimer };
-      const newArray = [...todoData.slice(0, idx), newItem, ...todoData.slice(idx + 1)];
+  onPauseTimer = (id) => {
+    const { todoData } = this.state;
+    const index = todoData.findIndex((el) => el.id === id);
+    const oldItemTodoData = todoData[index];
 
-      return {
-        todoData: newArray,
-      };
-    });
+    if (oldItemTodoData.timerStarted) {
+      clearInterval(this.timerId[index]);
+
+      this.setState(({ todoData }) => {
+        const oldItem = todoData[index];
+        const newItem = { ...oldItem, timerStarted: false, disabled: false };
+        const newArr = [...todoData.slice(0, index), newItem, ...todoData.slice(index + 1)];
+
+        return {
+          todoData: newArr,
+        };
+      });
+      this.setState({ disabled: false });
+    }
   };
 
   render() {
@@ -144,8 +196,8 @@ export default class App extends Component {
             filterData={filterData}
             onDeleted={this.deleteTask}
             onCheckboxClick={this.checkboxClick}
-            onGetTimeFromTimer={this.getTimeFromTimer}
-            onGetTimerStartedFromTimer={this.getTimerStartedFromTimer}
+            onPlayTimer={this.onPlayTimer}
+            onPauseTimer={this.onPauseTimer}
           />
           <Footer
             notCompletedTasks={notCompletedTasks}

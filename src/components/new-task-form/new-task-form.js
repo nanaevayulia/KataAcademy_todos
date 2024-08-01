@@ -58,6 +58,7 @@ export default class NewTaskForm extends Component {
           autoFocus
           value={label}
           onChange={this.onLabelChange}
+          required
         />
         <input
           className="new-todo-form__timer"
@@ -72,6 +73,7 @@ export default class NewTaskForm extends Component {
           placeholder="Sec"
           value={seconds}
           onChange={this.onSecondsChange}
+          required
         />
         <button type="submit"></button>
       </form>

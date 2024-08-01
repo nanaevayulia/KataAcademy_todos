@@ -13,10 +13,11 @@ export default class Task extends Component {
     time: new Date(),
     timerInSec: 0,
     timerStarted: false,
+    disabled: false,
     onDeleted: () => {},
     onCheckboxClick: () => {},
-    onGetTimeFromTimer: () => {},
-    onGetTimerStartedFromTimer: () => {},
+    onPlayTimer: () => {},
+    onPauseTimer: () => {},
   };
 
   static propTypes = {
@@ -28,23 +29,22 @@ export default class Task extends Component {
     timerStarted: PropTypes.bool,
     onDeleted: PropTypes.func,
     onCheckboxClick: PropTypes.func,
-    onGetTimeFromTimer: PropTypes.func,
-    onGetTimerStartedFromTimer: PropTypes.func,
+    onPlayTimer: PropTypes.func,
+    onPauseTimer: PropTypes.func,
   };
 
   render() {
     const {
-      id,
       label,
       completed,
       editing,
       time,
       timerInSec,
-      timerStarted,
+      disabled,
       onCheckboxClick,
       onDeleted,
-      onGetTimeFromTimer,
-      onGetTimerStartedFromTimer,
+      onPlayTimer,
+      onPauseTimer,
     } = this.props;
 
     let className = 'active';
@@ -64,13 +64,7 @@ export default class Task extends Component {
             <span className="title" onClick={onCheckboxClick}>
               {label}
             </span>
-            <Timer
-              id={id}
-              timerInSec={timerInSec}
-              timerStarted={timerStarted}
-              onGetTimeFromTimer={onGetTimeFromTimer}
-              onGetTimerStartedFromTimer={onGetTimerStartedFromTimer}
-            />
+            <Timer timerInSec={timerInSec} disabled={disabled} onPlayTimer={onPlayTimer} onPauseTimer={onPauseTimer} />
             <span className="description">created {formatDistanceToNow(time)} ago</span>
           </label>
           <button className="icon icon-edit"></button>
