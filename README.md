@@ -1,2 +1,2 @@
 Todo app<br/>
-Vercel timer - kata-academy-todos-mguhq2myq-yulias-projects-9b68f571.vercel.app
+Vercel timer - https://kata-academy-todos-git-timer-yulias-projects-9b68f571.vercel.app?_vercel_share=sNBS7ydKRTHPRy7XeOpwARMLyN4MbLy1
