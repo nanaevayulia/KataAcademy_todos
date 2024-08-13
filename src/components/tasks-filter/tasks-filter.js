@@ -1,84 +1,66 @@
-import { Component } from 'react';
+import { useState } from 'react';
 import PropTypes from 'prop-types';
 
 import './tasks-filter.css';
-export default class TasksFilter extends Component {
-  state = {
-    allButton: true,
-    activeButton: false,
-    completedButton: false,
-  };
+export default function TasksFilter({ setFilterData }) {
+  const [allButton, setAllButton] = useState(true);
+  const [activeButton, setActiveButton] = useState(false);
+  const [completedButton, setCompletedButton] = useState(false);
 
-  static defaultProps = {
-    setFilterData: () => {},
-  };
-
-  static propTypes = {
-    setFilterData: PropTypes.func,
-  };
-
-  onClickFilter = (e) => {
+  const onClickFilter = (e) => {
     const buttonClicked = e.target.innerText.toLowerCase();
     if (buttonClicked === 'all') {
-      this.setState({
-        allButton: true,
-        activeButton: false,
-        completedButton: false,
-      });
+      setAllButton(true), setActiveButton(false), setCompletedButton(false);
     } else if (buttonClicked === 'active') {
-      this.setState({
-        allButton: false,
-        activeButton: true,
-        completedButton: false,
-      });
+      setAllButton(false), setActiveButton(true), setCompletedButton(false);
     } else if (buttonClicked === 'completed') {
-      this.setState({
-        allButton: false,
-        activeButton: false,
-        completedButton: true,
-      });
+      setAllButton(false), setActiveButton(false), setCompletedButton(true);
     }
   };
 
-  render() {
-    const { setFilterData } = this.props;
-    const { allButton, activeButton, completedButton } = this.state;
-    return (
-      <ul className="filters">
-        <li>
-          <button
-            className={allButton ? 'selected' : ''}
-            onClick={(e) => {
-              setFilterData(e);
-              this.onClickFilter(e);
-            }}
-          >
-            All
-          </button>
-        </li>
-        <li>
-          <button
-            className={activeButton ? 'selected' : ''}
-            onClick={(e) => {
-              setFilterData(e);
-              this.onClickFilter(e);
-            }}
-          >
-            Active
-          </button>
-        </li>
-        <li>
-          <button
-            className={completedButton ? 'selected' : ''}
-            onClick={(e) => {
-              setFilterData(e);
-              this.onClickFilter(e);
-            }}
-          >
-            Completed
-          </button>
-        </li>
-      </ul>
-    );
-  }
+  return (
+    <ul className="filters">
+      <li>
+        <button
+          className={allButton ? 'selected' : ''}
+          onClick={(e) => {
+            setFilterData(e);
+            onClickFilter(e);
+          }}
+        >
+          All
+        </button>
+      </li>
+      <li>
+        <button
+          className={activeButton ? 'selected' : ''}
+          onClick={(e) => {
+            setFilterData(e);
+            onClickFilter(e);
+          }}
+        >
+          Active
+        </button>
+      </li>
+      <li>
+        <button
+          className={completedButton ? 'selected' : ''}
+          onClick={(e) => {
+            setFilterData(e);
+            onClickFilter(e);
+          }}
+        >
+          Completed
+        </button>
+      </li>
+    </ul>
+  );
 }
+
+TasksFilter.defaultProps = {
+  setFilterData: () => {},
+};
+
+TasksFilter.propTypes = {
+  setFilterData: PropTypes.func,
+};

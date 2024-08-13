@@ -1,4 +1,4 @@
-import { Component } from 'react';
+import { useState } from 'react';
 import PropTypes from 'prop-types';
 
 import NewTaskForm from '../new-task-form';
@@ -7,45 +7,14 @@ import Footer from '../footer';
 
 import './app.css';
 
-export default class App extends Component {
-  maxId = 0;
-  timerId = [];
-
-  state = {
-    todoData: [
-      this.createTodoTask('Completed task', new Date(2024, 4, 17), 90),
-      this.createTodoTask('Editing task', new Date(2024, 6, 4), 140),
-      this.createTodoTask('Active task', new Date(2024, 6, 17, 12, 10, 0), 15),
-    ],
-    filterData: 'all',
-  };
-
-  static defaultProps = {
-    todoData: [
-      {
-        id: 1,
-        label: 'Получить данные с сервера',
-        completed: false,
-        editing: false,
-        time: Date.now(),
-        timerInSec: 0,
-        timerStarted: false,
-        disabled: false,
-      },
-    ],
-    filterData: 'all',
-  };
-
-  static propTypes = {
-    todoData: PropTypes.arrayOf(PropTypes.object),
-    filterData: PropTypes.string,
-  };
-
-  createTodoTask(label, time, timerInSec) {
+let maxId = 0;
+let timerId = [];
+export default function App() {
+  function createTodoTask(label, time, timerInSec) {
     const trimLabel = label.replace(/ +/g, ' ').trim();
 
     return {
-      id: this.maxId++,
+      id: maxId++,
       label: trimLabel,
       completed: false,
       editing: false,
@@ -56,34 +25,37 @@ export default class App extends Component {
     };
   }
 
-  deleteTask = (id) => {
-    this.onPauseTimer(id);
+  const [todoData, setTodoData] = useState([
+    createTodoTask('Completed task', new Date(2024, 4, 17), 90),
+    createTodoTask('Editing task', new Date(2024, 6, 4), 140),
+    createTodoTask('Active task', new Date(2024, 6, 17, 12, 10, 0), 15),
+  ]);
+  const [filterData, setFilter] = useState('all');
 
-    this.setState(({ todoData }) => {
-      const idx = todoData.findIndex((item) => item.id === id);
-      const newArray = [...todoData.slice(0, idx), ...todoData.slice(idx + 1)];
-      return {
-        todoData: newArray,
-      };
+  const deleteTask = (id) => {
+    onPauseTimer(id);
+
+    setTodoData((prevTodoData) => {
+      const idx = prevTodoData.findIndex((item) => item.id === id);
+      const newArray = [...prevTodoData.slice(0, idx), ...prevTodoData.slice(idx + 1)];
+      return newArray;
     });
   };
 
-  addTask = (text, timerInSec) => {
-    const newTask = this.createTodoTask(text, new Date(), timerInSec);
+  const addTask = (text, timerInSec) => {
+    const newTask = createTodoTask(text, new Date(), timerInSec);
 
-    this.setState(({ todoData }) => {
-      const newArray = [...todoData, newTask];
-      return {
-        todoData: newArray,
-      };
+    setTodoData((prevTodoData) => {
+      const newArray = [...prevTodoData, newTask];
+      return newArray;
     });
   };
 
-  checkboxClick = (id) => {
-    this.onPauseTimer(id);
+  const checkboxClick = (id) => {
+    onPauseTimer(id);
 
-    this.setState(({ todoData }) => {
-      const newArray = todoData.map((item) => {
+    setTodoData((prevTodoData) => {
+      const newArray = prevTodoData.map((item) => {
         if (item.id === id) {
           item = {
             ...item,
@@ -103,109 +75,109 @@ export default class App extends Component {
         }
         return item;
       });
-      return {
-        todoData: newArray,
-      };
+      return newArray;
     });
   };
 
-  setFilterData = (e) => {
-    this.setState({ filterData: e.target.innerText.toLowerCase() });
+  const setFilterData = (e) => {
+    setFilter(e.target.innerText.toLowerCase());
   };
 
-  clearCompleted = () => {
-    this.setState(({ todoData }) => {
-      const newArray = todoData.filter((el) => !el.completed);
-      return {
-        todoData: newArray,
-      };
+  const clearCompleted = () => {
+    setTodoData((prevTodoData) => {
+      const newArray = prevTodoData.filter((el) => !el.completed);
+      return newArray;
     });
   };
 
-  tick(id) {
-    this.setState(({ todoData }) => {
-      const index = todoData.findIndex((el) => el.id === id);
+  function tick(id) {
+    setTodoData((prevTodoData) => {
+      const index = prevTodoData.findIndex((el) => el.id === id);
       const newItem = {
-        ...todoData[index],
+        ...prevTodoData[index],
         timerStarted: true,
-        timerInSec: todoData[index].timerInSec - 1,
+        timerInSec: prevTodoData[index].timerInSec - 1,
       };
-      const newArr = [...todoData.slice(0, index), newItem, ...todoData.slice(index + 1)];
+      const newArray = [...prevTodoData.slice(0, index), newItem, ...prevTodoData.slice(index + 1)];
 
-      return {
-        todoData: newArr,
-      };
+      return newArray;
     });
   }
 
-  onPlayTimer = (id) => {
-    const { todoData } = this.state;
+  const onPlayTimer = (id) => {
     const index = todoData.findIndex((el) => el.id === id);
     const oldItem = todoData[index];
 
     if (oldItem.timerStarted) {
-      clearInterval(this.timerId[index]);
+      clearInterval(timerId[index]);
     }
 
-    const newTimerId = setInterval(() => this.tick(id), 1000);
-    this.timerId[index] = newTimerId;
+    const newTimerId = setInterval(() => tick(id), 1000);
+    timerId[index] = newTimerId;
 
-    this.setState(({ todoData }) => {
+    setTodoData((prevTodoData) => {
       const newItem = { ...oldItem, disabled: true };
-      const newArr = [...todoData.slice(0, index), newItem, ...todoData.slice(index + 1)];
-      return {
-        todoData: newArr,
-      };
+      const newArray = [...prevTodoData.slice(0, index), newItem, ...prevTodoData.slice(index + 1)];
+      return newArray;
     });
   };
 
-  onPauseTimer = (id) => {
-    const { todoData } = this.state;
+  const onPauseTimer = (id) => {
     const index = todoData.findIndex((el) => el.id === id);
     const oldItemTodoData = todoData[index];
 
     if (oldItemTodoData.timerStarted) {
-      clearInterval(this.timerId[index]);
+      clearInterval(timerId[index]);
 
-      this.setState(({ todoData }) => {
-        const oldItem = todoData[index];
+      setTodoData((prevTodoData) => {
+        const oldItem = prevTodoData[index];
         const newItem = { ...oldItem, timerStarted: false, disabled: false };
-        const newArr = [...todoData.slice(0, index), newItem, ...todoData.slice(index + 1)];
-
-        return {
-          todoData: newArr,
-        };
+        const newArray = [...prevTodoData.slice(0, index), newItem, ...prevTodoData.slice(index + 1)];
+        return newArray;
       });
-      this.setState({ disabled: false });
     }
   };
 
-  render() {
-    const { todoData, filterData } = this.state;
-    const notCompletedTasks = todoData.filter((el) => !el.completed).length;
+  const notCompletedTasks = todoData.filter((el) => !el.completed).length;
 
-    return (
-      <section className="todoapp">
-        <header className="header">
-          <h1>Todos</h1>
-          <NewTaskForm onTaskAdded={this.addTask} />
-        </header>
-        <section className="main">
-          <TaskList
-            todos={todoData}
-            filterData={filterData}
-            onDeleted={this.deleteTask}
-            onCheckboxClick={this.checkboxClick}
-            onPlayTimer={this.onPlayTimer}
-            onPauseTimer={this.onPauseTimer}
-          />
-          <Footer
-            notCompletedTasks={notCompletedTasks}
-            setFilterData={this.setFilterData}
-            onClearCompleted={this.clearCompleted}
-          />
-        </section>
+  return (
+    <section className="todoapp">
+      <header className="header">
+        <h1>Todos</h1>
+        <NewTaskForm onTaskAdded={addTask} />
+      </header>
+      <section className="main">
+        <TaskList
+          todos={todoData}
+          filterData={filterData}
+          onDeleted={deleteTask}
+          onCheckboxClick={checkboxClick}
+          onPlayTimer={onPlayTimer}
+          onPauseTimer={onPauseTimer}
+        />
+        <Footer notCompletedTasks={notCompletedTasks} setFilterData={setFilterData} onClearCompleted={clearCompleted} />
       </section>
-    );
-  }
+    </section>
+  );
 }
+
+App.defaultProps = {
+  todoData: [
+    {
+      id: 1,
+      label: 'Получить данные с сервера',
+      completed: false,
+      editing: false,
+      time: Date.now(),
+      timerInSec: 0,
+      timerStarted: false,
+      disabled: false,
+    },
+  ],
+  filterData: 'all',
+};
+
+App.propTypes = {
+  todoData: PropTypes.arrayOf(PropTypes.object),
+  filterData: PropTypes.string,
+};
